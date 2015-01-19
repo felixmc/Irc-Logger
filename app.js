@@ -1,90 +1,56 @@
-var config = require("./config");
+// config
+var config     = require("./config");
+var retryDelay = 5000;
 
+// modules
 var IrcClient = require("nirc-lib");
+var chatLog   = require("./ChatLogger")(config.mongodb);
 
-var dataLog = require("./")(config.mongodb);
+// data
+var connections = {};
 
-
-
-for (serverName in config.servers) {
-	var server = config.servers[serverName];
-
-	var client = new IrcClient({
-		host: server.host,
-		port: server.port,
-		nick: generateNick(server.nick),
-		name: generateName(server.name)
-	});
-
-	client.on("connect", function() {
-		for (room in server.rooms) {
-			client.join(room);
-		}
-	});
-
-	client.on("data", dataLog.capture);
+function generateName(name) {
+	if (Array.isArray(name)) {
+		name[Math.floor(Math.random() * name.length)];	
+	} else if (name === "%random%") {
+		return Math.random().toString(36).substring(7);
+	} else {
+		return name;
+	}
 }
 
+function connectToServer(serverName) {
+	var server = config.servers[serverName];
+		
+	var clientConfig = {
+		id  : serverName,
+		host: server.host,
+		port: server.port,
+		nick: generateName(server.nick),
+		name: generateName(server.name)
+	};
+	
+	var client = new IrcClient(clientConfig);
 
+	chatLog.capture(client, clientConfig);
 
+	client.on("connected", function() {
+		server.rooms.forEach(function(room) {
+			client.join(room);
+		});
+	});
 
+	client.on("end", function() {
+		delete connections[serverName];
+		
+		setTimeout(function() {
+			connectToServer(serverName);
+		}, retryDelay);
+	});
 
+	connections[serverName] = client;
+}
 
-
-
-
-
-
-
-
-var client = new IrcClient({ 
-	localhost: "localhost",
-	port: 6668,
-	nick: "b00byTrap",
-	realname: Math.random().toString(36).substring(7)
-});
-
-client.on("connected", function() {
-	client.join("salt");
-});
-
-client.on("message", function(channel, author, message) {
-	var target = message.split(" ").slice(-1)[0];
-
-	var msg = target + " puts the pussy on da chainwax"; 
-
-	client.message(channel, msg);
-});
-
-// on end, try again after delay
-//
-//
-// read config file
-//		servers: {
-//			i2p: {
-//				host: ""
-//				port: 12345
-//				// nick - optional to inherit from room
-//				// real name - optional to inherit from room
-//				rooms: {
-//					salt: {
-//						nick: [bob, bob2, bob3] // can be array or single value. if array, picks random, can also be "%random%" which will be replaced by fully random username
-//						realName: ["Bobby", bobster] // same as with nicks
-//					}
-//				}
-//			}
-//
-//			]
-//		}
-//
-//  data logger class takes an irc message and splits up and logs it appropriately
-//
-//  create IRC clients for each room
-//  bind data event to dataLogger
-//
-//
-//
-//
-//
-//
-//
+for (serverName in config.servers) {
+	connectToServer(serverName);
+}

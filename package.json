@@ -2,7 +2,7 @@
   "name": "irc-logger",
   "version": "0.1.0",
   "private": "true",
-  "description": "simple irc logger",
+  "description": "simple irc client that logs irc events to a mongodb database",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,6 +19,6 @@
   "homepage": "https://github.com/felixmc/Irc-Logger",
   "dependencies": {
     "mongodb": "^1.4.28",
-    "nirc-lib": "0.0.1"
+    "nirc-lib": "^0.1.0"
   }
 }

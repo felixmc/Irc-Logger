@@ -1,0 +1,18 @@
+{
+	"mongodb": {
+		"host": "localhost",
+		"port": 27017,
+		"username": "",
+		"password": "",
+		"database": "IrcLogs"
+	},
+	"servers": {
+		"MyServer": {
+			"host": "myserver.net",
+			"port": 12345,
+			"nick": "IrcLogger5",
+			"name": "Irc Logger",
+			"rooms": ["char", "support"]
+		}
+	}
+}
