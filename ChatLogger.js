@@ -3,7 +3,7 @@ var mongo = require("mongodb").MongoClient;
 function ChatLogger(config) {
 	this.rooms = {};
 
-	var dbUrl = "mongodb://" + (config.user ? config.user + ":" + config.password + "@" : "") + (config.host || "localhost") + ":" + (config.port || 27017) + "/" + config.database;
+	var dbUrl = "mongodb://" + (config.username ? config.username + ":" + config.password + "@" : "") + (config.host || "localhost") + ":" + (config.port || 27017) + "/" + config.database;
 
 	this.log = function(data) {
 		data.date = new Date();
