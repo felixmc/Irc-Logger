@@ -94,7 +94,7 @@ ChatLogger.prototype.capture = function(client, server) {
 		});
 	});
 	
-	client.on("end", function() {
+	client.on("close", function() {
 		self.log({
 			type  : "server-disconnect",
 			server: server.id
