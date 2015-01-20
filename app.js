@@ -40,7 +40,7 @@ function connectToServer(serverName) {
 		});
 	});
 
-	client.on("end", function() {
+	client.on("close", function() {
 		delete connections[serverName];
 		
 		setTimeout(function() {
